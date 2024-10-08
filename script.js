@@ -22,16 +22,10 @@ function crearRompecabezas() {
             pieza.classList.add("pieza");
             pieza.style.backgroundImage = "url('imagen.jpg')";
             pieza.style.backgroundPosition = `${(i % 3) * -100}px ${Math.floor(i / 3) * -100}px`;
-            pieza.setAttribute("data-index", i);
-
-            // Soporte para arrastrar con mouse
             pieza.setAttribute("draggable", true);
+            pieza.setAttribute("data-index", i);
             pieza.addEventListener("dragstart", (e) => arrastrarPieza(e, index));
             pieza.addEventListener("dragend", soltarPieza);
-
-            // Soporte para arrastrar con touch
-            pieza.addEventListener("touchstart", (e) => arrastrarPieza(e, index));
-            pieza.addEventListener("touchend", soltarPieza);
         } else {
             pieza.classList.add("pieza-vacia");
         }
@@ -45,13 +39,11 @@ function crearRompecabezas() {
 
 // Función para comenzar a arrastrar una pieza
 function arrastrarPieza(evento, index) {
-    evento.preventDefault(); // Prevenir comportamiento por defecto
     posicionActual = index; // Guardar la pieza que se está arrastrando
 }
 
 // Función para soltar una pieza
-function soltarPieza(evento) {
-    evento.preventDefault(); // Prevenir comportamiento por defecto
+function soltarPieza() {
     if (esMovible(posicionActual, posicionVacia)) {
         // Intercambiar pieza con el espacio vacío
         [piezas[posicionVacia], piezas[posicionActual]] = [piezas[posicionActual], piezas[posicionVacia]];
