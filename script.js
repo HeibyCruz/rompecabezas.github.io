@@ -2,8 +2,8 @@ let piezas = [];
 let rompecabezas = document.getElementById("rompecabezas");
 let mensaje = document.getElementById("mensaje");
 let reiniciarBtn = document.getElementById("reiniciar");
-let posicionVacia = 8;  // La última posición es la vacía (índice 8)
-let posicionActual = null; // La pieza que se está arrastrando
+let posicionVacia = 8; // La última posición es la vacía (índice 8)
+let piezaArrastrada = null; // La pieza que se está arrastrando
 
 // Crear el rompecabezas
 function crearRompecabezas() {
@@ -39,38 +39,25 @@ function crearRompecabezas() {
 
 // Función para comenzar a arrastrar una pieza
 function arrastrarPieza(evento, index) {
-    posicionActual = index; // Guardar la pieza que se está arrastrando
+    piezaArrastrada = index; // Guardar la pieza que se está arrastrando
 }
 
 // Función para soltar una pieza
-function soltarPieza() {
-    if (esMovible(posicionActual, posicionVacia)) {
-        // Intercambiar pieza con el espacio vacío
-        [piezas[posicionVacia], piezas[posicionActual]] = [piezas[posicionActual], piezas[posicionVacia]];
+function soltarPieza(evento) {
+    evento.preventDefault(); // Prevenir comportamiento por defecto
+    // Intercambiar la pieza arrastrada con el espacio vacío
+    [piezas[posicionVacia], piezas[piezaArrastrada]] = [piezas[piezaArrastrada], piezas[posicionVacia]];
 
-        // Actualizar posición vacía
-        posicionVacia = posicionActual;
+    // Actualizar posición vacía
+    posicionVacia = piezaArrastrada;
 
-        // Actualizar el tablero
-        actualizarTablero();
+    // Actualizar el tablero
+    actualizarTablero();
 
-        // Verificar si el rompecabezas está completo
-        if (comprobarSiEstaCompleto()) {
-            mostrarMensaje();
-        }
+    // Verificar si el rompecabezas está completo
+    if (comprobarSiEstaCompleto()) {
+        mostrarMensaje();
     }
-}
-
-// Verificar si la pieza es movible (está adyacente al espacio vacío)
-function esMovible(index, vacia) {
-    const adyacencias = [
-        vacia - 1,  // Izquierda
-        vacia + 1,  // Derecha
-        vacia - 3,  // Arriba
-        vacia + 3   // Abajo
-    ];
-
-    return adyacencias.includes(index);
 }
 
 // Actualizar la disposición de las piezas en el tablero
