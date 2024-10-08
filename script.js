@@ -1,20 +1,20 @@
-// Variables globales
 let piezas = [];
 let rompecabezas = document.getElementById("rompecabezas");
 let mensaje = document.getElementById("mensaje");
 let reiniciarBtn = document.getElementById("reiniciar");
 let posicionVacia = 8;  // La última posición es la vacía (índice 8)
+let posicionActual = null; // La pieza que se está arrastrando
 
-// Crear piezas del rompecabezas
+// Crear el rompecabezas
 function crearRompecabezas() {
     let ordenPiezas = [...Array(8).keys()]; // Creamos las primeras 8 piezas
-    ordenPiezas.push(null); // La última pieza será el espacio vacío
-    ordenPiezas.sort(() => Math.random() - 0.5); // Desordenamos las piezas
+    ordenPiezas.push(null); // La última será el espacio vacío
+    ordenPiezas.sort(() => Math.random() - 0.5); // Desordenar
 
     // Limpiar el rompecabezas anterior
     rompecabezas.innerHTML = "";
 
-    // Crear y colocar las piezas en el tablero
+    // Crear y colocar las piezas
     ordenPiezas.forEach((i, index) => {
         let pieza = document.createElement("div");
 
@@ -22,35 +22,55 @@ function crearRompecabezas() {
             pieza.classList.add("pieza");
             pieza.style.backgroundImage = "url('imagen.jpg')";
             pieza.style.backgroundPosition = `${(i % 3) * -100}px ${Math.floor(i / 3) * -100}px`;
+            pieza.setAttribute("draggable", true);
             pieza.setAttribute("data-index", i);
-            pieza.addEventListener("click", () => moverPieza(index));
+            pieza.addEventListener("dragstart", (e) => arrastrarPieza(e, index));
+            pieza.addEventListener("dragend", soltarPieza);
         } else {
-            pieza.classList.add("pieza-vacia");  // Crear el espacio vacío
+            pieza.classList.add("pieza-vacia");
         }
 
         piezas[index] = pieza;
         rompecabezas.appendChild(pieza);
     });
 
-    // Actualizar posición vacía
-    posicionVacia = ordenPiezas.indexOf(null);
+    posicionVacia = ordenPiezas.indexOf(null); // Actualizar posición vacía
 }
 
-// Mover una pieza a la posición vacía
-function moverPieza(index) {
-    // Intercambiar la pieza seleccionada con el espacio vacío
-    [piezas[posicionVacia], piezas[index]] = [piezas[index], piezas[posicionVacia]];
+// Función para comenzar a arrastrar una pieza
+function arrastrarPieza(evento, index) {
+    posicionActual = index; // Guardar la pieza que se está arrastrando
+}
 
-    // Actualizar la nueva posición vacía
-    posicionVacia = index;
+// Función para soltar una pieza
+function soltarPieza() {
+    if (esMovible(posicionActual, posicionVacia)) {
+        // Intercambiar pieza con el espacio vacío
+        [piezas[posicionVacia], piezas[posicionActual]] = [piezas[posicionActual], piezas[posicionVacia]];
 
-    // Actualizar DOM: volver a renderizar las piezas
-    actualizarTablero();
+        // Actualizar posición vacía
+        posicionVacia = posicionActual;
 
-    // Comprobar si el rompecabezas está completo
-    if (comprobarSiEstaCompleto()) {
-        mostrarMensaje();
+        // Actualizar el tablero
+        actualizarTablero();
+
+        // Verificar si el rompecabezas está completo
+        if (comprobarSiEstaCompleto()) {
+            mostrarMensaje();
+        }
     }
+}
+
+// Verificar si la pieza es movible (está adyacente al espacio vacío)
+function esMovible(index, vacia) {
+    const adyacencias = [
+        vacia - 1,  // Izquierda
+        vacia + 1,  // Derecha
+        vacia - 3,  // Arriba
+        vacia + 3   // Abajo
+    ];
+
+    return adyacencias.includes(index);
 }
 
 // Actualizar la disposición de las piezas en el tablero
